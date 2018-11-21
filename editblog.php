@@ -1,4 +1,41 @@
+<?php 
+$server = "localhost";
+$user	= "root";
+$pass	= "";
+$dbnaam = "blog";
 
+$conn = new mysqli($server, $user, $pass, $dbnaam);
+	
+if ($conn->connect_error){
+	die("Geen verbinding: " . $conn->connect_error);
+}
+
+
+
+
+	$id = $_GET['id'];
+	$naam = '$_POST["naam"]';
+	$title = '$_POST["title"]';
+	$text = '$_POST["blogtext"]';
+
+$getblog = "UPDATE BlogPosts SET Naam = '$naam'' , Title = '$title', Blogtext = '$text', `tijd` = CURRENT_TIME() WHERE id = $id";
+$edit = $conn->query($getblog);
+
+if(isset($_POST['update'])){
+	if(!empty($_POST['naam']) && $_POST['title'] && $_POST['blogtext'])
+	{
+	mysqli_query($dbnaam, $getblog);
+//	header("location:viewblog.php");
+	}
+	else{
+		echo "er ging wat fout";
+		}
+}
+
+
+$conn->close();
+
+?>
 
 <!DOCTYPE HTML>
 <html>
@@ -11,46 +48,8 @@
 	
 <!--<?php include ('header.php'); ?>-->
 	<?php 
-	
-	$getblog = "UPDATE `BlogPosts` SET `Naam` = 'ee', `Title` = 'oooo', `Blogtext` = 'eee', `tijd` = CURRENT_DATE() WHERE `BlogPosts`.`id` = $id";
-	$edit = $conn->query($getblog);
- 
-if($edit->num_rows > 0){
-    while($row = $edit->fetch_assoc()){
-	
-	echo "<form action='editblog.php'  method='post'>";
-	echo "Auteurs Naam:";
-	echo "<br>" ;
-	echo "<input type='text' name='naam' value=''>";
-	echo "<br>";
-	echo "<br>";
-	echo "Title:" ;
-	echo "<br>"; 
-	echo "<input type='text' name='title' value=''>";
-	echo "<br>";
-	echo "<br>";
-	echo "Blogtext:" ;
-	echo "<br>" ;
-	echo "<textarea name='blogtext' cols='32' rows='4' value=''></textarea>";
-	echo "<br>";
-	echo "<br>";
-	
-	echo "<input type='submit' name='submit' value='Send'>";
-	echo "<br>";
-	echo "<br>";
-//<!--		<div class="g-recaptcha" data-sitekey="6Ld8_3oUAAAAAL_PjvSkECDnAYpKThxOxHAT0DP-"></div>-->
-	echo "</form>";
-	}
-?>
-</body>
 
-</html>
-
-
-<?php
-error_reporting(0);
-
-$server = "localhost";
+	$server = "localhost";
 $user	= "root";
 $pass	= "";
 $dbnaam = "blog";
@@ -61,25 +60,43 @@ if ($conn->connect_error){
 	die("Geen verbinding: " . $conn->connect_error);
 }
 
-$naam = $_POST["naam"];
-$title = $_POST["title"];
-$text = $_POST["blogtext"];
+//	
+//	$getblog = "UPDATE `BlogPosts` SET `Naam` = '$naam', `Title` = '$title', `Blogtext` = '$text', `tijd` = CURRENT_DATE() WHERE `BlogPosts`.`id` = $id";
+//	$edit = $conn->query($getblog);
+	
 
-$mkblog = "INSERT INTO `BlogPosts` (`id`, `Naam`, `Title`, `Blogtext`, `tijd`) VALUES (NULL, '$naam', '$title', '$text', CURRENT_TIMESTAMP)";
+	
+	
+ 
+	
+	$post = "SELECT * FROM BlogPosts WHERE id=$id LIMIT 1";
+	$result = $conn->query($post);
+	
+    if($result->num_rows>0){
+    while($row = $result->fetch_assoc()) {
+            $naam =	$row['Naam'];
+			$title=	$row['Title'];
+            $text = $row['Blogtext'];
+            
+                echo "<form action='editblog.php?id='$id' method='post'>";
+				
+				echo "<input type='text' name='naam' placeholder='Naam' value='$naam'>";
+			
+                echo "<input type='text' name='title' placeholder='Title' value='$title'>";
+                echo "<textarea name='blogtext' cols='32' rows='4' placeholder='plaats hier je  blog bericht.'>$text</textarea>";
+          
+		        echo "<input name='update' type='submit' value='Update'>";
+				echo "<input name='reset' type='reset' value='Reset'>";
+				echo "</from>";
+          }
+        }
+    ?>
+
+</body>
+
+</html>
 
 
 
-if(isset($_POST['submit'])){
-	if(!empty($_POST['naam']) && $_POST['title'] && $_POST['blogtext'])
-	{
-	mysqli_query($conn, $mkblog);
-	header("location:viewblog.php");
-	}
-	else{
-		echo "er ging wat fout";
-		die;
-		}
-}
-$conn->close();
-?>
+
 
