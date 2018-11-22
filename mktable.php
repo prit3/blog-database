@@ -1,14 +1,5 @@
 <?php
-$server = "localhost";
-$user	= "root";
-$pass	= "";
-$dbnaam = "blog";
-
-$conn = new mysqli($server, $user, $pass, $dbnaam);
-	
-if ($conn->connect_error){
-	die("Geen verbinding: " . $conn->connect_error);
-}
+include ('dbconn.php');
 
 $mktable = "CREATE TABLE BlogPosts(
 			id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
