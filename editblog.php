@@ -1,9 +1,11 @@
-<!--Code werkt hellaas niet als gewild hij werkt alleen op spesefiek nummer bij update maar niet met $id-->
+
 
 
 <?php
     include ('dbconn.php');
     $id = $_GET["id"];
+error_reporting(0);
+
 ?>
 
 <!DOCTYPE HTML>
@@ -19,27 +21,48 @@
         <?php 
             include ('dbconn.php');
 
-                $post = "SELECT * FROM BlogPosts WHERE id='$id' LIMIT 1";
+                $post = "SELECT * FROM BlogPosts WHERE id='$id' LIMIT 1 ";
                 $result = $conn->query($post);
 
-            //	var_dump($result);
+           
 
-                if($result->num_rows>0){
-                while($row = $result->fetch_assoc()) {
+                if ($result->num_rows>0){
+                while ($row = $result->fetch_assoc()) {
 
-                        $naam =	$row['Naam'];
-                        $title=	$row['Title'];
+                        $naam = $row['Naam'];
+                        $title = $row['Title'];
                         $text = $row['Blogtext'];
-            //        	var_dump($row);
+                        $tags = $row['Tag_id'];
+           
 
 
-                            echo "<form action='editblog.php?id='$id' method='post'>";
+                            echo "<form action='editblog.php?id=$id' method='post'>";
+                            echo "Name:";
+                            echo "<br>";
                             echo "<input type='text' name='naam' placeholder='Naam' value='$naam'>";
-                            echo $id;
-
+                            echo "<br>";
+                            echo "Title:";
+                            echo "<br>";
                             echo "<input type='text' name='title' placeholder='Title' value='$title'>";
+                            echo "<br>";
+                            echo "Blogtext";
+                            echo "<br>";
                             echo "<textarea name='blogtext' cols='32' rows='4' placeholder='plaats hier je  blog bericht.'>$text</textarea>";
+                            echo "<br>";
+                            echo "Gekoze tags zijn:";
+                            echo $tags;
+                            
+                            $tag = "SELECT * FROM Tags";
+                            $result = $conn->query($tag);
 
+                            if ($result->num_rows > 0){
+                                while ($row = $result->fetch_assoc()){
+//                                    $tags = $row['Tag_id'];
+                                    echo "<input type='radio' name='taged' value='$tags'>";
+                                    echo $row['Tag'];
+                                }
+                            }
+                            echo "<br>";
                             echo "<input name='update' type='submit' value='Update'>";
                             echo "<input name='reset' type='reset' value='Reset'>";
                             echo "</form>";
@@ -53,36 +76,24 @@
 
 
 <?php 
-    include ('dbconn.php');
 
-    
-    if (array_key_exists('update', $_POST) && array_key_exists('naam', $_POST) && array_key_exists('blogtext', $_POST) && array_key_exists('id', $_GET)){
-
-	$id   = $_GET['id'];
-	$naam = $_POST['naam'];
-	$title = $_POST['title'];
-	$text = $_POST['blogtext'];
-    echo "het werkt";
-    }
-   
-    else{die;}
-
-    var_dump ($naam);
-
-    var_dump($id);
-
-    $getblog = "UPDATE `BlogPosts` SET `Naam` = '$naam', `Title` = '$title', `Blogtext` = '$text', `tijd` = CURRENT_TIME() WHERE `BlogPosts`.`id` = 22";
-
-
-    if(isset($_POST['update'])){
-        if(!empty($_POST['naam']) && $_POST['title'] && $_POST['blogtext'])
-        {
-        mysqli_query($conn, $getblog);
-        header("location:viewblog.php");
+    if (isset($_POST['update'])){
+        if (!empty($_POST['naam']) && $_POST['title'] && $_POST['blogtext'] && $_POST['taged']){
+            $naam = $_POST['naam'];
+            $title = $_POST['title'];
+            $text = $_POST['blogtext'];
+            $taged = $_POST['taged'];
+            $up = 
+            "UPDATE `BlogPosts` SET `Naam` = '$naam', `Title` = '$title', `Blogtext` = '$text', `tijd` = CURRENT_TIME(), `Tag_id` = '$taged'  WHERE `BlogPosts`.`id`= $id";
+            
+            
+            mysqli_query($conn, $up);
+            header("location:viewblog.php");
+            
         }
-        else{
+        else {
             echo "er ging wat fout";
-            }
+        }
     }
 
 
